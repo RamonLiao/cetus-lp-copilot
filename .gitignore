@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.env
+.env.local
+__pycache__/
+*.pyc
+.venv/
+data/cache/
+build/
+.vercel
+contracts/cetus_copilot/build/
