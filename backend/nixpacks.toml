@@ -1,8 +1,8 @@
 [phases.setup]
-nixPkgs = ["python313"]
+nixPkgs = ["python313", "uv"]
 
 [phases.install]
-cmds = ["pip install uv && uv sync --frozen"]
+cmds = ["uv sync --frozen"]
 
 [start]
 cmd = "uv run uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"
