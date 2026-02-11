@@ -9,6 +9,7 @@ interface StrategyCardProps {
   name: string;
   data: StrategyData;
   timeInRange: number;
+  holdDays: number;
   isRecommended: boolean;
   isSelected?: boolean;
   onClick?: () => void;
@@ -30,6 +31,7 @@ export function StrategyCard({
   name,
   data,
   timeInRange,
+  holdDays,
   isRecommended,
   isSelected,
   onClick,
@@ -95,12 +97,15 @@ export function StrategyCard({
               </p>
             </div>
           </div>
-          <div className="flex justify-between text-xs text-muted-foreground pt-2 border-t">
-            <span>Fees: ${data.fee_usd}</span>
-            <span>IL: -${data.il_usd}</span>
-            <span className={netPositive ? "text-emerald-400" : "text-red-400"}>
-              Net: ${data.net_usd}
-            </span>
+          <div className="pt-2 border-t space-y-1">
+            <p className="text-xs text-muted-foreground">{holdDays}-day P&L</p>
+            <div className="flex justify-between text-sm font-medium">
+              <span className="text-emerald-400">+${data.fee_usd}</span>
+              <span className="text-red-400">-${data.il_usd}</span>
+              <span className={netPositive ? "text-emerald-400" : "text-red-400"}>
+                Net ${data.net_usd}
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>

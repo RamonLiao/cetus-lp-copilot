@@ -87,13 +87,17 @@ async def fetch_coingecko_prices(
         return df
 
 
-def get_cached_prices(pool_id: str) -> np.ndarray | None:
-    """Load cached hourly close prices."""
+def get_cached_prices(pool_id: str, days: int = 30) -> np.ndarray | None:
+    """Load cached hourly close prices, trimmed to requested days."""
     cache_file = CACHE_DIR / f"{pool_id}_prices.csv"
     if cache_file.exists():
         df = pd.read_csv(cache_file)
         if len(df) > 24:  # at least 1 day
-            return df["close"].values
+            n_hours = days * 24
+            prices = df["close"].values
+            if len(prices) > n_hours:
+                return prices[-n_hours:]
+            return prices
     return None
 
 
@@ -106,8 +110,8 @@ async def get_prices(pool_id: str, days: int = 30, current_price: float | None =
     """
     Get hourly close prices. Try cache → Birdeye → CoinGecko → mock.
     """
-    # Try cache
-    cached = get_cached_prices(pool_id)
+    # Try cache (trimmed to requested days)
+    cached = get_cached_prices(pool_id, days=days)
     if cached is not None:
         return cached
 

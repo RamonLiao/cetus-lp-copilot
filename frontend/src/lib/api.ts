@@ -30,6 +30,7 @@ export interface SimulationResult {
   time_in_range: Record<string, number>;
   current_price: number;
   volatility_30d: number;
+  hold_days: number;
 }
 
 export interface MonteCarloResult {

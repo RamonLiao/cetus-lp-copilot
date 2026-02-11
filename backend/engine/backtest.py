@@ -253,4 +253,5 @@ def simulate_strategies(
         "time_in_range": {name: r.time_in_range for name, r in results.items()},
         "current_price": round(current_price, 6),
         "volatility_30d": round(vol, 4),
+        "hold_days": hold_days,
     }

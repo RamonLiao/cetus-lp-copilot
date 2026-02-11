@@ -182,8 +182,8 @@ export default function SimulatePage() {
               Risk: {result.risk_score}
             </Badge>
             <span className="text-sm text-muted-foreground">
-              Current Price: ${result.current_price} | 30d Volatility:{" "}
-              {(result.volatility_30d * 100).toFixed(1)}%
+              Current Price: ${result.current_price} | Volatility (annualized):{" "}
+              {(result.volatility_30d * 100).toFixed(1)}% | Hold: {result.hold_days}d
             </span>
           </div>
 
@@ -195,6 +195,7 @@ export default function SimulatePage() {
                 name={name}
                 data={data}
                 timeInRange={result.time_in_range[name]}
+                holdDays={result.hold_days}
                 isRecommended={name === result.recommended}
                 isSelected={name === selectedStrategy}
                 onClick={() => setSelectedStrategy(name)}
