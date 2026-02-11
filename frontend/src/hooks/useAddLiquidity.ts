@@ -8,6 +8,7 @@ import {
 import {
   buildAddLiquidityTx,
   getCetusSDK,
+  getPoolAddress,
   type BuildAddLiquidityParams,
 } from "@/lib/cetus";
 import { Transaction } from "@mysten/sui/transactions";
@@ -47,25 +48,30 @@ export function useAddLiquidity() {
       setNftTxDigest(null);
 
       try {
-        // 1) Add liquidity via Cetus SDK
-        getCetusSDK(account.address);
-        const tx = await buildAddLiquidityTx(params);
+        const isMainnet = process.env.NEXT_PUBLIC_SUI_NETWORK === "mainnet";
+        const onChainPoolId = getPoolAddress(params.poolId);
 
-        setStatus("signing");
-        const result = await signAndExecute({ transaction: tx });
-        setTxDigest(result.digest);
+        // 1) Add liquidity via Cetus SDK (mainnet only — testnet has no standard pools)
+        if (isMainnet) {
+          getCetusSDK(account.address);
+          const tx = await buildAddLiquidityTx(params);
 
-        // 2) Mint Strategy NFT
-        setStatus("building");
+          setStatus("signing");
+          const result = await signAndExecute({ transaction: tx });
+          setTxDigest(result.digest);
+          setStatus("building");
+        }
+
+        // 2) Mint Strategy NFT (use on-chain pool address, not our internal ID)
         const nftTx = new Transaction();
         nftTx.moveCall({
           target: `${STRATEGY_NFT_PACKAGE_ID}::${STRATEGY_NFT_MODULE}::${STRATEGY_NFT_MINT_FN}`,
           arguments: [
-            nftTx.pure.address(params.poolId),
+            nftTx.pure.address(onChainPoolId),
             nftTx.pure.u32(params.lowerTick),
             nftTx.pure.u32(params.upperTick),
             nftTx.pure.u64(Math.round(params.currentPrice * 1e6)),
-            nftTx.pure.u64(params.amountUsd),
+            nftTx.pure.u64(Math.round(params.amountUsd)),
             nftTx.pure.u8(params.strategyType),
             nftTx.pure.u8(params.riskScore),
             nftTx.pure.u64(Date.now()),
