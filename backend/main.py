@@ -69,6 +69,9 @@ async def simulate(req: SimulateRequest):
 
     prices = await get_prices(req.pool_id, days=max(req.hold_days, 30), current_price=pool["current_price"])
 
+    # Use latest fetched price as current_price (hardcoded defaults may be stale)
+    live_price = float(prices[-1]) if len(prices) > 0 else pool["current_price"]
+
     # Calculate 30d volatility
     returns = np.diff(np.log(prices))
     hourly_vol = float(np.std(returns))
@@ -76,7 +79,7 @@ async def simulate(req: SimulateRequest):
 
     result = simulate_strategies(
         prices=prices,
-        current_price=pool["current_price"],
+        current_price=live_price,
         fee_rate=pool["fee_rate"],
         amount_usd=req.amount_usd,
         pool_tvl=pool["tvl"],
@@ -97,13 +100,15 @@ async def monte_carlo(req: MonteCarloRequest):
 
     prices = await get_prices(req.pool_id, days=max(req.hold_days, 30), current_price=pool["current_price"])
 
+    live_price = float(prices[-1]) if len(prices) > 0 else pool["current_price"]
+
     returns = np.diff(np.log(prices))
     hourly_vol = float(np.std(returns))
     annualized_vol = hourly_vol * np.sqrt(24 * 365)
     drift = float(np.mean(returns)) * 24 * 365
 
     result = run_monte_carlo(
-        current_price=pool["current_price"],
+        current_price=live_price,
         volatility=annualized_vol,
         drift=drift,
         fee_rate=pool["fee_rate"],

@@ -251,6 +251,6 @@ def simulate_strategies(
         "recommended": recommended,
         "risk_score": risk_score,
         "time_in_range": {name: r.time_in_range for name, r in results.items()},
-        "current_price": current_price,
+        "current_price": round(current_price, 6),
         "volatility_30d": round(vol, 4),
     }
