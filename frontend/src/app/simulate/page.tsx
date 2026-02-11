@@ -232,11 +232,17 @@ export default function SimulatePage() {
                         {result.strategies[selectedStrategy].net}%
                       </span>
                     </p>
-                    {txStatus === "success" && txDigest && (
+                    {txStatus === "success" && (txDigest || nftTxDigest) && (
                       <div className="text-sm text-emerald-400 mt-2 space-y-1">
-                        <p>LP TX: <a href={`https://suiscan.xyz/testnet/tx/${txDigest}`} target="_blank" rel="noopener noreferrer" className="underline">{txDigest.slice(0, 16)}...</a></p>
+                        <p className="font-semibold">Strategy minted on-chain!</p>
+                        {txDigest && (
+                          <p>LP TX: <a href={`https://suiscan.xyz/testnet/tx/${txDigest}`} target="_blank" rel="noopener noreferrer" className="underline">{txDigest.slice(0, 16)}...</a></p>
+                        )}
                         {nftTxDigest && (
                           <p>NFT TX: <a href={`https://suiscan.xyz/testnet/tx/${nftTxDigest}`} target="_blank" rel="noopener noreferrer" className="underline">{nftTxDigest.slice(0, 16)}...</a></p>
+                        )}
+                        {nftTxDigest && (
+                          <p className="text-muted-foreground">View NFT in your <a href={`https://suiscan.xyz/testnet/account/${account?.address}/portfolio`} target="_blank" rel="noopener noreferrer" className="text-sky-400 underline">wallet portfolio</a></p>
                         )}
                       </div>
                     )}
@@ -275,7 +281,9 @@ export default function SimulatePage() {
                         ? "Building TX..."
                         : txStatus === "signing"
                           ? "Sign in Wallet..."
-                          : "Add Liquidity + Mint NFT"}
+                          : txStatus === "success"
+                            ? "Minted!"
+                            : "Mint Strategy NFT"}
                   </Button>
                 </div>
               </CardContent>
