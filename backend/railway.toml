@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"
+healthcheckPath = "/api/pools"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

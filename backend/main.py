@@ -26,6 +26,14 @@ class SimulateRequest(BaseModel):
     amount_usd: float = 1000
     hold_days: int = 30
 
+    def validate_inputs(self):
+        if self.amount_usd <= 0 or self.amount_usd > 10_000_000:
+            raise HTTPException(400, "amount_usd must be between 0 and 10,000,000")
+        if self.hold_days < 1 or self.hold_days > 365:
+            raise HTTPException(400, "hold_days must be between 1 and 365")
+        if not self.pool_id.strip():
+            raise HTTPException(400, "pool_id is required")
+
 
 class MonteCarloRequest(BaseModel):
     pool_id: str
@@ -33,6 +41,16 @@ class MonteCarloRequest(BaseModel):
     hold_days: int = 30
     range_pct: float = 0.15
     n_simulations: int = 2000
+
+    def validate_inputs(self):
+        if self.amount_usd <= 0 or self.amount_usd > 10_000_000:
+            raise HTTPException(400, "amount_usd must be between 0 and 10,000,000")
+        if self.hold_days < 1 or self.hold_days > 365:
+            raise HTTPException(400, "hold_days must be between 1 and 365")
+        if self.range_pct <= 0 or self.range_pct > 1.0:
+            raise HTTPException(400, "range_pct must be between 0 and 1.0")
+        if self.n_simulations < 100 or self.n_simulations > 10000:
+            raise HTTPException(400, "n_simulations must be between 100 and 10,000")
 
 
 @app.get("/api/pools")
@@ -43,6 +61,7 @@ async def list_pools():
 
 @app.post("/api/simulate")
 async def simulate(req: SimulateRequest):
+    req.validate_inputs()
     pools = await fetch_pools()
     pool = get_pool_by_id(req.pool_id, pools)
     if not pool:
@@ -70,6 +89,7 @@ async def simulate(req: SimulateRequest):
 
 @app.post("/api/monte-carlo")
 async def monte_carlo(req: MonteCarloRequest):
+    req.validate_inputs()
     pools = await fetch_pools()
     pool = get_pool_by_id(req.pool_id, pools)
     if not pool:

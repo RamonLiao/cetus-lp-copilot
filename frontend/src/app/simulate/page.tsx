@@ -40,7 +40,7 @@ export default function SimulatePage() {
   const [mcResult, setMcResult] = useState<MonteCarloResult | null>(null);
   const [poolsLoaded, setPoolsLoaded] = useState(false);
   const [selectedStrategy, setSelectedStrategy] = useState<string>("");
-  const { execute: addLiquidity, status: txStatus, txDigest, error: txError, reset: resetTx } = useAddLiquidity();
+  const { execute: addLiquidity, status: txStatus, txDigest, nftTxDigest, error: txError, reset: resetTx } = useAddLiquidity();
 
   const loadPools = async () => {
     if (poolsLoaded) return;
@@ -134,7 +134,10 @@ export default function SimulatePage() {
               <input
                 type="number"
                 value={amountUsd}
-                onChange={(e) => setAmountUsd(Number(e.target.value))}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  if (!isNaN(v) && v >= 0 && v <= 10_000_000) setAmountUsd(v);
+                }}
                 className="w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm"
                 min={10}
                 max={1000000}
@@ -158,7 +161,7 @@ export default function SimulatePage() {
             {/* Simulate Button */}
             <Button
               onClick={handleSimulate}
-              disabled={!selectedPool || loading}
+              disabled={!selectedPool || loading || amountUsd <= 0}
               className="bg-emerald-500 hover:bg-emerald-600 text-white"
             >
               {loading ? "Simulating..." : "Simulate"}
@@ -229,9 +232,12 @@ export default function SimulatePage() {
                       </span>
                     </p>
                     {txStatus === "success" && txDigest && (
-                      <p className="text-sm text-emerald-400 mt-2">
-                        TX: <a href={`https://suiscan.xyz/testnet/tx/${txDigest}`} target="_blank" rel="noopener noreferrer" className="underline">{txDigest.slice(0, 16)}...</a>
-                      </p>
+                      <div className="text-sm text-emerald-400 mt-2 space-y-1">
+                        <p>LP TX: <a href={`https://suiscan.xyz/testnet/tx/${txDigest}`} target="_blank" rel="noopener noreferrer" className="underline">{txDigest.slice(0, 16)}...</a></p>
+                        {nftTxDigest && (
+                          <p>NFT TX: <a href={`https://suiscan.xyz/testnet/tx/${nftTxDigest}`} target="_blank" rel="noopener noreferrer" className="underline">{nftTxDigest.slice(0, 16)}...</a></p>
+                        )}
+                      </div>
                     )}
                     {txStatus === "error" && txError && (
                       <p className="text-sm text-red-400 mt-2">{txError}</p>
@@ -244,6 +250,8 @@ export default function SimulatePage() {
                       const pool = pools.find((p) => p.id === selectedPool);
                       if (!pool || !result) return;
                       const strat = result.strategies[selectedStrategy];
+                      const strategyTypeMap: Record<string, number> = { narrow: 0, medium: 1, wide: 2 };
+                      const riskMap: Record<string, number> = { LOW: 0, MEDIUM: 1, HIGH: 2 };
                       resetTx();
                       addLiquidity({
                         poolId: selectedPool,
@@ -253,6 +261,10 @@ export default function SimulatePage() {
                         currentPrice: result.current_price,
                         tokenA: pool.token_a,
                         tokenB: pool.token_b,
+                        strategyType: strategyTypeMap[selectedStrategy] ?? 1,
+                        riskScore: riskMap[result.risk_score] ?? 1,
+                        lowerTick: 0,
+                        upperTick: 0,
                       });
                     }}
                   >

@@ -68,8 +68,8 @@
 - [ ] Landing page 潤色 + logo
 - [ ] Deploy: Vercel (frontend) + Railway (backend)
 - [ ] Demo video 2-3 min
+- [x] Monkey testing: 負數金額、超大數字、空池 — ✅ Session 4 完成
 - [ ] DeepSurge 提交 + Twitter threads ×3
-- [ ] Monkey testing: 負數金額、超大數字、空池、斷網
 
 ---
 
@@ -100,7 +100,67 @@
 
 ### TODO（下一個 chat）
 - [ ] 實際 testnet 測試 execute flow（連錢包 + 簽名）
-- [ ] Testnet deploy Strategy NFT
-- [ ] Landing page 潤色 + logo
-- [ ] Deploy: Vercel + Railway
+- [x] Testnet deploy Strategy NFT — ✅ Session 4 完成
+- [x] Landing page 潤色 — ✅ Session 4 完成
+- [x] Deploy configs (Vercel + Railway) — ✅ Session 4 完成
+- [x] Monkey testing (input validation) — ✅ Session 4 完成
+- [ ] 手動 deploy to Vercel + Railway
 - [ ] Demo video + 提交
+
+---
+
+## 2026-02-12 Session 4: Deploy + Polish + Monkey Testing
+
+### 完成項目
+
+#### Testnet Deploy Strategy NFT ✅
+- Package ID: `0x1939056b726a3b6f9423d7f0b711516486392887fd2b7a56076a97b1c28a4883`
+- TX: `2zbT9cAockL2wBWnNHXkeoJvpZdMFU7L2vuZBPXySGxv`
+- UpgradeCap: `0x08d50e3c94374711fca8e744c37ce7b3b1dec04aec3d11a16ae9c5110b00878d`
+- **新建** `frontend/src/lib/constants.ts` — package ID + module/fn 常量
+- **改** `frontend/src/hooks/useAddLiquidity.ts` — 加 NFT mint 到 execute flow（2-step: add liquidity → mint NFT）
+- **改** `frontend/src/app/simulate/page.tsx` — 傳 strategyType/riskScore，顯示 NFT TX link
+
+#### Landing Page 潤色 ✅
+- **改** `frontend/src/app/page.tsx` — 完全重寫
+  - 漸層背景 orbs（emerald/blue/purple）
+  - Nav bar with gradient logo + Launch App button
+  - Hero with status badge + gradient title + CTA
+  - Stats row (2000+ sims, 3 strategies, <1s speed)
+  - Feature cards with SVG icons + hover effects
+  - "How It Works" 4-step section
+  - Bottom CTA card
+
+#### Deploy Configs ✅
+- **新建** `backend/Procfile` — Railway/Heroku start command
+- **新建** `backend/railway.toml` — Railway deploy config
+- **新建** `backend/nixpacks.toml` — uv-based Python build
+- **新建** `frontend/vercel.json` — Vercel framework config
+
+#### Monkey Testing (Input Validation) ✅
+- **改** `backend/main.py` — SimulateRequest/MonteCarloRequest 加 `validate_inputs()`
+  - amount_usd: 0~10M, hold_days: 1~365, range_pct: 0~1, n_simulations: 100~10000
+- **改** `frontend/src/app/simulate/page.tsx` — amount input clamp + disabled button when invalid
+
+### 驗證狀態
+- ✅ Frontend `pnpm run build` — clean
+- ✅ Backend imports OK
+- ✅ Move contract deployed to testnet
+
+### 修改檔案清單
+- `frontend/src/lib/constants.ts` — 新建
+- `frontend/src/hooks/useAddLiquidity.ts` — NFT mint integration
+- `frontend/src/app/simulate/page.tsx` — NFT display + input validation
+- `frontend/src/app/page.tsx` — Landing page redesign
+- `frontend/vercel.json` — 新建
+- `backend/Procfile` — 新建
+- `backend/railway.toml` — 新建
+- `backend/nixpacks.toml` — 新建
+- `backend/main.py` — Input validation
+
+### TODO（下一個 chat）
+- [ ] 安裝 vercel/railway CLI 並實際 deploy
+- [ ] 設定 NEXT_PUBLIC_API_URL 環境變數
+- [ ] 實際 testnet 測試 execute flow
+- [ ] Demo video 2-3 min
+- [ ] DeepSurge 提交 + Twitter threads ×3
