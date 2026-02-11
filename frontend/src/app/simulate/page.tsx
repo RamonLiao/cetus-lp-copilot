@@ -25,6 +25,7 @@ import {
   type SimulationResult,
   type MonteCarloResult,
 } from "@/lib/api";
+import { useAddLiquidity } from "@/hooks/useAddLiquidity";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
@@ -39,6 +40,7 @@ export default function SimulatePage() {
   const [mcResult, setMcResult] = useState<MonteCarloResult | null>(null);
   const [poolsLoaded, setPoolsLoaded] = useState(false);
   const [selectedStrategy, setSelectedStrategy] = useState<string>("");
+  const { execute: addLiquidity, status: txStatus, txDigest, error: txError, reset: resetTx } = useAddLiquidity();
 
   const loadPools = async () => {
     if (poolsLoaded) return;
@@ -226,14 +228,41 @@ export default function SimulatePage() {
                         {result.strategies[selectedStrategy].net}%
                       </span>
                     </p>
+                    {txStatus === "success" && txDigest && (
+                      <p className="text-sm text-emerald-400 mt-2">
+                        TX: <a href={`https://suiscan.xyz/testnet/tx/${txDigest}`} target="_blank" rel="noopener noreferrer" className="underline">{txDigest.slice(0, 16)}...</a>
+                      </p>
+                    )}
+                    {txStatus === "error" && txError && (
+                      <p className="text-sm text-red-400 mt-2">{txError}</p>
+                    )}
                   </div>
                   <Button
-                    disabled={!account}
+                    disabled={!account || txStatus === "building" || txStatus === "signing"}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                    onClick={() => {
+                      const pool = pools.find((p) => p.id === selectedPool);
+                      if (!pool || !result) return;
+                      const strat = result.strategies[selectedStrategy];
+                      resetTx();
+                      addLiquidity({
+                        poolId: selectedPool,
+                        minPrice: strat.range[0].toString(),
+                        maxPrice: strat.range[1].toString(),
+                        amountUsd,
+                        currentPrice: result.current_price,
+                        tokenA: pool.token_a,
+                        tokenB: pool.token_b,
+                      });
+                    }}
                   >
-                    {account
-                      ? "Add Liquidity + Mint NFT"
-                      : "Connect Wallet First"}
+                    {!account
+                      ? "Connect Wallet First"
+                      : txStatus === "building"
+                        ? "Building TX..."
+                        : txStatus === "signing"
+                          ? "Sign in Wallet..."
+                          : "Add Liquidity + Mint NFT"}
                   </Button>
                 </div>
               </CardContent>
