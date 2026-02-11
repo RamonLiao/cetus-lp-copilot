@@ -200,7 +200,37 @@
 - `frontend/src/components/ui/{badge,button,select,separator,slider,tabs}.tsx` — import 改為 @radix-ui/react-*
 
 ### TODO（下一個 chat）
-- [ ] 驗證 /simulate 頁面 API 連通
+- [x] 驗證 /simulate 頁面 API 連通 — ✅ Session 6 完成
+- [ ] 實際 testnet 測試 execute flow
+- [ ] Demo video 2-3 min
+- [ ] DeepSurge 提交 + Twitter threads ×3
+
+---
+
+## 2026-02-12 Session 6: Fix Live Price + API 驗證
+
+### 完成項目
+
+#### API 連通驗證 ✅
+- 確認 Railway backend 三個 endpoint 都回 200
+- 發現 `/api/simulate` 和 `/api/monte-carlo` 回傳全部為 0
+
+#### 修復 stale current_price bug ✅
+- **根因**: hardcoded `current_price=3.45` (SUI) 但 CoinGecko 回傳真實價格 ~0.89，所有 backtest range 都 out of range → fees/IL 全為 0
+- **改** `backend/main.py` — simulate + monte-carlo 用 `prices[-1]`（最新 fetched price）取代 hardcoded `pool["current_price"]`
+- **改** `backend/engine/backtest.py` — round `current_price` to 6 decimals
+- 本地驗證: narrow fees=$2.83, IL=$11.9, time_in_range=0.304 ✅
+
+### 踩過的坑
+- Railway 上 CoinGecko API 能通，所以 `get_prices` 拿到真實歷史（0.87~1.9），但 pool hardcoded price 還是 3.45 → range 完全不匹配
+- 本地沒 cache 且沒 API key，mock data 用 `current_price` 當 base 所以本地沒問題，prod 才爆
+
+### 修改檔案清單
+- `backend/main.py` — live_price from fetched prices
+- `backend/engine/backtest.py` — round current_price
+
+### TODO（下一個 chat）
+- [ ] 等 Railway deploy 完後驗證 prod API 回傳有值
 - [ ] 實際 testnet 測試 execute flow
 - [ ] Demo video 2-3 min
 - [ ] DeepSurge 提交 + Twitter threads ×3

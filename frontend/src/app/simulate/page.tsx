@@ -196,6 +196,7 @@ export default function SimulatePage() {
                 data={data}
                 timeInRange={result.time_in_range[name]}
                 isRecommended={name === result.recommended}
+                isSelected={name === selectedStrategy}
                 onClick={() => setSelectedStrategy(name)}
               />
             ))}

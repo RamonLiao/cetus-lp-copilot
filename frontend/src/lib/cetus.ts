@@ -103,14 +103,12 @@ export async function buildAddLiquidityTx(
     tickSpacing
   );
 
-  // Calculate token amounts from USD
+  // Calculate token amounts from USD (must be integer strings for BigInt conversion)
   // fixCoinA: deposit half as token A
-  const amountA = fixCoinA
-    ? toDecimalsAmount(amountUsd / 2 / currentPrice, decimalsA).toString()
-    : "0";
-  const amountB = fixCoinA
-    ? "0"
-    : toDecimalsAmount(amountUsd / 2, decimalsB).toString();
+  const rawA = Number(toDecimalsAmount(amountUsd / 2 / currentPrice, decimalsA));
+  const rawB = Number(toDecimalsAmount(amountUsd / 2, decimalsB));
+  const amountA = fixCoinA ? Math.floor(rawA).toString() : "0";
+  const amountB = fixCoinA ? "0" : Math.floor(rawB).toString();
 
   const coinTypeA = COIN_TYPES[tokenA] || "";
   const coinTypeB = COIN_TYPES[tokenB] || "";

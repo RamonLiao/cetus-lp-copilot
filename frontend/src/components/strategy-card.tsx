@@ -10,6 +10,7 @@ interface StrategyCardProps {
   data: StrategyData;
   timeInRange: number;
   isRecommended: boolean;
+  isSelected?: boolean;
   onClick?: () => void;
 }
 
@@ -30,6 +31,7 @@ export function StrategyCard({
   data,
   timeInRange,
   isRecommended,
+  isSelected,
   onClick,
 }: StrategyCardProps) {
   const netPositive = data.net > 0;
@@ -43,9 +45,11 @@ export function StrategyCard({
     >
       <Card
         className={`cursor-pointer transition-all hover:scale-[1.02] ${
-          isRecommended
-            ? "border-emerald-500 ring-2 ring-emerald-500/20"
-            : "border-border"
+          isSelected
+            ? "border-sky-500 ring-2 ring-sky-500/30 scale-[1.02]"
+            : isRecommended
+              ? "border-emerald-500 ring-2 ring-emerald-500/20"
+              : "border-border"
         }`}
         onClick={onClick}
       >
