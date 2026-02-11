@@ -102,7 +102,7 @@ def save_cache(pool_id: str, df: pd.DataFrame):
     df.to_csv(cache_file, index=False)
 
 
-async def get_prices(pool_id: str, days: int = 30) -> np.ndarray:
+async def get_prices(pool_id: str, days: int = 30, current_price: float | None = None) -> np.ndarray:
     """
     Get hourly close prices. Try cache → Birdeye → CoinGecko → mock.
     """
@@ -133,7 +133,8 @@ async def get_prices(pool_id: str, days: int = 30) -> np.ndarray:
         return df["close"].values
 
     # Mock data: GBM around a base price
-    base = 3.5 if "sui" in pool_id else 0.15
+    base_defaults = {"sui-usdc": 3.5, "cetus-sui": 0.045, "usdt-usdc": 1.0}
+    base = current_price or base_defaults.get(pool_id, 3.5)
     n = days * 24
     rng = np.random.default_rng(123)
     returns = rng.normal(0, 0.01, n)

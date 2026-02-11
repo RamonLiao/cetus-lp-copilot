@@ -67,7 +67,7 @@ async def simulate(req: SimulateRequest):
     if not pool:
         raise HTTPException(404, f"Pool {req.pool_id} not found")
 
-    prices = await get_prices(req.pool_id, days=max(req.hold_days, 30))
+    prices = await get_prices(req.pool_id, days=max(req.hold_days, 30), current_price=pool["current_price"])
 
     # Calculate 30d volatility
     returns = np.diff(np.log(prices))
@@ -95,7 +95,7 @@ async def monte_carlo(req: MonteCarloRequest):
     if not pool:
         raise HTTPException(404, f"Pool {req.pool_id} not found")
 
-    prices = await get_prices(req.pool_id, days=max(req.hold_days, 30))
+    prices = await get_prices(req.pool_id, days=max(req.hold_days, 30), current_price=pool["current_price"])
 
     returns = np.diff(np.log(prices))
     hourly_vol = float(np.std(returns))
@@ -119,7 +119,10 @@ async def monte_carlo(req: MonteCarloRequest):
 
 @app.get("/api/pool/{pool_id}/history")
 async def pool_history(pool_id: str, days: int = 30):
-    prices = await get_prices(pool_id, days=days)
+    pools = await fetch_pools()
+    pool = get_pool_by_id(pool_id, pools)
+    cp = pool["current_price"] if pool else None
+    prices = await get_prices(pool_id, days=days, current_price=cp)
     return {
         "pool_id": pool_id,
         "prices": [

@@ -159,8 +159,48 @@
 - `backend/main.py` — Input validation
 
 ### TODO（下一個 chat）
-- [ ] 安裝 vercel/railway CLI 並實際 deploy
-- [ ] 設定 NEXT_PUBLIC_API_URL 環境變數
+- [x] Deploy: Vercel (frontend) + Railway (backend) — ✅ Session 5 完成
+- [x] 設定 NEXT_PUBLIC_API_URL 環境變數 — ✅ Session 5 完成
+- [ ] 實際 testnet 測試 execute flow
+- [ ] Demo video 2-3 min
+- [ ] DeepSurge 提交 + Twitter threads ×3
+
+---
+
+## 2026-02-12 Session 5: Deploy to Vercel + Railway
+
+### 完成項目
+
+#### Backend → Railway ✅
+- GitHub repo 連接 auto deploy
+- Root Directory: `backend`
+- 修 `nixpacks.toml`: `nixPkgs = ["python313", "uv"]`（Railway 沒有 pip）
+- URL: https://cetus-lp-copilot.up.railway.app
+
+#### Frontend → Vercel ✅
+- GitHub repo 連接 auto deploy
+- Root Directory: `frontend`
+- 環境變數: `NEXT_PUBLIC_API_URL=https://cetus-lp-copilot.up.railway.app`
+- URL: https://cetus-lp-copilot.vercel.app
+- 修了 3 個 build error:
+  1. 移除 `radix-ui` meta-package → 改用個別 `@radix-ui/react-*`
+  2. 加 `@vanilla-extract/css` + `@vanilla-extract/recipes`
+  3. 加 `@vanilla-extract/dynamic`
+  （以上都是 `@mysten/dapp-kit@0.14.35` 的 peer deps）
+
+### 踩過的坑
+- Railway nixpacks 環境沒有 `pip`，要用 `nixPkgs = ["uv"]` 直接裝
+- `radix-ui` meta-package 帶 `@vanilla-extract` build-time 依賴，Vercel Turbopack 解析不到
+- `@mysten/dapp-kit@0.14.35` 運行時需要 3 個 `@vanilla-extract/*` 套件，不會自動安裝
+
+### 修改檔案清單
+- `backend/nixpacks.toml` — 改用 nix uv
+- `frontend/package.json` — 移除 radix-ui，加 vanilla-extract deps
+- `frontend/pnpm-lock.yaml` — lockfile 更新
+- `frontend/src/components/ui/{badge,button,select,separator,slider,tabs}.tsx` — import 改為 @radix-ui/react-*
+
+### TODO（下一個 chat）
+- [ ] 驗證 /simulate 頁面 API 連通
 - [ ] 實際 testnet 測試 execute flow
 - [ ] Demo video 2-3 min
 - [ ] DeepSurge 提交 + Twitter threads ×3
