@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   title: "Cetus LP Risk Copilot",
   description:
     "Simulate, compare, and execute concentrated liquidity strategies on Cetus DEX with real-time risk analysis.",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

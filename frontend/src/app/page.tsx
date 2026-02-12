@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -66,9 +67,7 @@ export default function Home() {
       {/* Nav */}
       <nav className="w-full max-w-5xl flex items-center justify-between py-6">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-            LP
-          </div>
+          <Image src="/logo.png" alt="Cetus LP Copilot" width={32} height={32} className="rounded-lg" />
           <span className="font-semibold text-sm">Cetus LP Copilot</span>
         </div>
         <div className="flex items-center gap-3">
