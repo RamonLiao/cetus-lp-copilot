@@ -19,9 +19,10 @@ interface Props {
 
 export function MonteCarloChart({ data }: Props) {
   const chartData = data.histogram.map((bin) => ({
-    range: `$${bin.bin_start}`,
+    midpoint: parseFloat(((bin.bin_start + bin.bin_end) / 2).toFixed(2)),
     count: bin.count,
-    midpoint: (bin.bin_start + bin.bin_end) / 2,
+    bin_start: bin.bin_start,
+    bin_end: bin.bin_end,
   }));
 
   return (
@@ -62,21 +63,25 @@ export function MonteCarloChart({ data }: Props) {
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
             <XAxis
-              dataKey="range"
+              dataKey="midpoint"
+              type="number"
               tick={{ fontSize: 10, fill: "#888" }}
-              interval="preserveStartEnd"
+              tickFormatter={(v: number) => `$${v}`}
+              domain={["dataMin", "dataMax"]}
             />
             <YAxis tick={{ fontSize: 10, fill: "#888" }} />
             <Tooltip
               contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid #333" }}
               labelStyle={{ color: "#888" }}
+              formatter={(value: number) => [value, "Simulations"]}
+              labelFormatter={(label: number) => `PnL: $${label}`}
             />
             <ReferenceLine x={0} stroke="#666" strokeDasharray="3 3" />
             <ReferenceLine
-              x={`$${data.var_95}`}
+              x={data.var_95}
               stroke="#ef4444"
               strokeDasharray="5 5"
-              label={{ value: "95% VaR", fill: "#ef4444", fontSize: 10 }}
+              label={{ value: "95% VaR", fill: "#ef4444", fontSize: 10, position: "top" }}
             />
             <Bar
               dataKey="count"

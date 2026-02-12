@@ -230,7 +230,78 @@
 - `backend/engine/backtest.py` — round current_price
 
 ### TODO（下一個 chat）
-- [ ] 等 Railway deploy 完後驗證 prod API 回傳有值
-- [ ] 實際 testnet 測試 execute flow
+- [x] 等 Railway deploy 完後驗證 prod API 回傳有值 — ✅ Session 7 完成
+- [x] 實際 testnet 測試 execute flow — ✅ Session 7 完成
 - [ ] Demo video 2-3 min
+- [ ] DeepSurge 提交 + Twitter threads ×3
+
+---
+
+## 2026-02-12 Session 7: Execute Flow 修復 + Testnet Mint NFT
+
+### 完成項目
+
+#### Strategy Card 選取高亮 ✅
+- `StrategyCard` 新增 `isSelected` prop，sky-500 ring 區分於 recommended 的 emerald
+- 點擊 card 底部 Execute section 同步更新
+
+#### BigInt Conversion Fix ✅
+- **根因**: `toDecimalsAmount()` 回傳浮點數（如 `558154695922.9032`），Cetus SDK 內部 `BigInt()` 爆掉
+- **改** `cetus.ts` — `Math.floor()` 強制整數
+
+#### Testnet Pool 地址研究 ✅
+- Cetus testnet 沒有標準 SUI/USDC CLMM pool（全是 meme token/SUI pairs）
+- SDK test data 裡的 pool address 已不存在（testnet reset）
+- 整理了 testnet vs mainnet 的 coin type 差異（testnet 用 faucet package `0x26b3...4abc`）
+
+#### Testnet Execute Flow ✅
+- **改** `useAddLiquidity.ts` — testnet 跳過 Cetus add liquidity，只 mint Strategy NFT
+- **改** `cetus.ts` — network-aware pool addresses + coin types（`POOL_ADDRESS_MAP[NETWORK]`）
+- 修了 `nftTx.pure.address(params.poolId)` bug — 之前傳 `"sui-usdc"` 字串，改為 0x 地址
+
+#### NFT Mint 成功 UI ✅
+- 修了成功提示不顯示的 bug（條件 `txDigest && ...` 在 testnet 永遠 false）
+- 新增: "Strategy minted on-chain!" + NFT TX link + wallet portfolio link
+- Button 成功後顯示 "Minted!"
+
+#### Railway Deploy Fix ✅
+- 刪除 Procfile（與 nixpacks 衝突，導致跳過 `uv sync` → uvicorn not found）
+- Birdeye API key 加到 Railway env var，code 不用改
+
+### 踩過的坑
+- `BigInt()` 只接受整數 — `BigInt(558.9)` 直接 RangeError
+- Cetus testnet pool 地址跟 mainnet 完全不同，且 testnet 會 reset 導致舊地址失效
+- Railway Procfile 優先級 > nixpacks.toml `[start]`，但 Procfile 不會觸發 nixpacks install phase
+- Move 合約 `address` type 需要有效 0x hex，`"sui-usdc"` 字串會 crash
+
+### 修改檔案清單
+- `frontend/src/components/strategy-card.tsx` — isSelected prop + sky-500 ring
+- `frontend/src/app/simulate/page.tsx` — isSelected pass + success UI + button text
+- `frontend/src/lib/cetus.ts` — network-aware config + BigInt fix
+- `frontend/src/hooks/useAddLiquidity.ts` — testnet NFT-only flow + pool address fix
+- `backend/Procfile` — 刪除
+
+### TODO（下一個 chat）
+- [x] Demo video 腳本 — ✅ Session 8 完成
+- [ ] 錄製 Demo video 2-3 min
+- [ ] DeepSurge 提交 + Twitter threads ×3
+
+---
+
+## 2026-02-12 Session 8: Demo Script
+
+### 完成項目
+
+#### Demo 腳本 ✅
+- **新建** `demo-script.md` — 2.5 min 錄影腳本（英式英文）
+  - 5 段結構: Landing hook → Simulate → Charts → Mint NFT → Architecture recap
+  - 每段標注時間戳、螢幕動作、旁白台詞
+  - Key Talking Points cheat sheet（IL math, Monte Carlo, stack）
+  - Recording tips（節奏、滑鼠動作、重點停頓）
+
+### 新增檔案
+- `demo-script.md` — demo 錄影腳本
+
+### TODO（下一個 chat）
+- [ ] 錄製 Demo video 2-3 min
 - [ ] DeepSurge 提交 + Twitter threads ×3
