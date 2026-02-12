@@ -73,7 +73,7 @@ export function MonteCarloChart({ data }: Props) {
             <Tooltip
               contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid #333" }}
               labelStyle={{ color: "#888" }}
-              formatter={(value: number) => [value, "Simulations"]}
+              formatter={(value: number | undefined) => [value ?? 0, "Simulations"]}
               labelFormatter={(label: number) => `PnL: $${label}`}
             />
             <ReferenceLine x={0} stroke="#666" strokeDasharray="3 3" />
