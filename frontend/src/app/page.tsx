@@ -67,8 +67,8 @@ export default function Home() {
       {/* Nav */}
       <nav className="w-full max-w-5xl flex items-center justify-between py-6">
         <div className="flex items-center gap-2">
-          <Image src="/logo.png" alt="Cetus LP Copilot" width={32} height={32} className="rounded-lg" />
-          <span className="font-semibold text-sm">Cetus LP Copilot</span>
+          <Image src="/logo.png" alt="Cetus LP Copilot" width={64} height={64} className="rounded-lg" />
+          <span className="font-bold text-lg">Cetus LP Copilot</span>
         </div>
         <div className="flex items-center gap-3">
           <a
